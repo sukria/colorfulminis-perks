@@ -1,6 +1,6 @@
 {
   "skill_name": "cfm-montecarlo",
-  "note": "Deux niveaux de validation. `test_moteur.py` verifie le moteur automatiquement : il se lance seul et n'a pas besoin d'un modele. Les scenarios ci-dessous verifient le comportement de la competence elle-meme, et se jouent a la main (ou par une session Claude sur demande) chaque fois que SKILL.md change. Le repertoire de travail de chaque scenario est `exemple/`, sauf mention contraire.",
+  "note": "Deux niveaux de validation. `test_moteur.py` verifie le moteur automatiquement : il se lance seul et n'a pas besoin d'un modele. Les scenarios ci-dessous verifient le comportement de la competence elle-meme, et se jouent a la main (ou par une session Claude sur demande) chaque fois que SKILL.md change. Le repertoire de travail de chaque scenario est `exemple/`, sauf mention contraire. L'exemple livre est un jeu d'arene minimal : cinq niveaux de Combat, 10 points de vie, et deux zones plates a decouvrir.",
   "evals": [
     {
       "id": 1,
@@ -24,25 +24,25 @@
       "id": 4,
       "name": "le bareme est extrait en constantes nommees",
       "prompt": "/cfm-montecarlo exemple/regles.md",
-      "expected_output": "regles.py declare le seuil, les degats par 5, les degats par 6 et le seuil de defense en constantes en tete de fichier. Aucun de ces nombres n'apparait en dur dans le corps de resoudre(). Chaque arme porte en commentaire le texte de sa clause."
+      "expected_output": "regles.py declare les degats par 5, les degats par 6, le plancher de des, le plafond de des et les points de vie en constantes en tete de fichier. Aucun de ces nombres n'apparait en dur dans le corps de resoudre(). La formule du nombre de des porte en commentaire le texte de sa regle."
     },
     {
       "id": 5,
       "name": "resoudre() joue un coup et n'agrege rien",
       "prompt": "/cfm-montecarlo exemple/regles.md",
-      "expected_output": "resoudre(scenario, rng) retourne un dict d'une seule resolution. Elle ne contient ni boucle sur les tirages, ni moyenne, ni statistics, ni accumulateur. Elle utilise le rng recu en argument et n'appelle jamais random directement."
+      "expected_output": "resoudre(scenario, rng) retourne un dict pour UN tirage. Elle peut boucler a l'interieur d'un tirage quand la mesure l'exige — ici, enchainer les tours jusqu'a l'abattage — mais elle n'agrege jamais entre tirages : ni moyenne, ni statistics, ni accumulateur inter-appels. Elle utilise le rng recu en argument et n'appelle jamais random directement."
     },
     {
       "id": 6,
-      "name": "l'anomalie de l'Arc long est trouvee et enoncee",
+      "name": "les deux zones plates sont trouvees et enoncees",
       "prompt": "/cfm-montecarlo exemple/regles.md puis « qu'est-ce qui cloche ? »",
-      "expected_output": "Identifie que l'Arc long augmente fortement le taux de reussite (96,0 % contre 87,3 % a Vigueur 3, armure 0) sans changer les degats moyens (1,50 contre 1,49), parce que les 3 devenus 4 touchent mais que le bareme ne paie que les 5 et les 6. Enonce le verdict avant l'explication, et chiffre les deux colonnes."
+      "expected_output": "Identifie que le plafond de 6 des et le plancher de 1 de aplatissent les extremes : un Combat 6 abat n'importe quel adversaire en 3,86 tours, de 2 a 6, et un Combat 2 met 20,6 tours contre 3, 4, 5 comme 6. Signale au passage qu'un Combat 4 et un Combat 6 sont identiques face a un Combat 2. Enonce le verdict avant l'explication, et chiffre les lignes concernees."
     },
     {
       "id": 7,
       "name": "une correction a la fois, puis relance",
       "prompt": "suite de l'eval 6 : « corrige »",
-      "expected_output": "Propose UNE modification du bareme, la justifie, l'applique dans regles.py et relance la simulation avec la meme graine. Ne modifie pas plusieurs clauses dans la meme passe et ne touche pas au texte de regles.md sans le demander."
+      "expected_output": "Propose UNE modification du bareme — relever le plafond, ou borner l'ecart plutot que le nombre de des — la justifie, l'applique dans regles.py et relance avec la meme graine. Ne modifie pas plusieurs constantes dans la meme passe et ne touche pas au texte de regles.md sans le demander."
     },
     {
       "id": 8,

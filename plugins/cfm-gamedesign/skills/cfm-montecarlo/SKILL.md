@@ -62,7 +62,7 @@ def resoudre(scenario, rng) -> dict: ...
 
 - **Le barème vit en haut du fichier**, en constantes nommées. Une valeur numérique enfouie dans `resoudre()` est un barème qu'on ne pourra plus modifier sans relire le code.
 - **Chaque arme, option ou clause est décrite avec les mots de sa règle**, en commentaire. C'est ce qui permet de vérifier le code contre le texte, ligne à ligne.
-- **`resoudre()` ne fait aucune moyenne et n'agrège rien.** Elle joue un coup, une fois, et retourne ce qui s'est passé. L'agrégation est le travail du moteur.
+- **`resoudre()` n'agrège jamais entre tirages.** Elle joue une résolution, une fois, et retourne ce qui s'est passé. Elle a le droit de boucler *à l'intérieur* d'un tirage quand la mesure l'exige — enchaîner les tours jusqu'à l'abattage, par exemple. Ce qu'elle ne fait jamais, c'est une moyenne : c'est le travail du moteur.
 
 ### 4 · Lancer
 

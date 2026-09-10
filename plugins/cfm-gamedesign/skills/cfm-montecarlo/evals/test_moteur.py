@@ -185,42 +185,57 @@ def test_regles_invalides():
                      f"code {r.returncode}")
 
 
-def test_exemple_fourni():
-    """L'exemple livre tourne, et son anomalie est bien la.
+def lire_moyennes(texte, section_voulue):
+    """Extrait {(colonne 1, colonne 2): moyenne} d'une section du resume."""
+    moyennes = {}
+    section = None
+    for ligne in texte.splitlines():
+        if ligne.startswith("## "):
+            section = ligne[3:].strip()
+            continue
+        if section != section_voulue or not ligne.startswith("| ") or "---" in ligne:
+            continue
+        cellules = [c.strip() for c in ligne.strip("|").split("|")]
+        try:
+            moyennes[(cellules[0], cellules[1])] = float(cellules[2])
+        except ValueError:
+            continue  # la ligne d'entetes
+    return moyennes
 
-    L'Arc long touche nettement plus que le Baton et n'inflige pas plus de
-    degats : c'est le defaut que le tutoriel doit faire trouver.
+
+def test_exemple_fourni():
+    """L'exemple livre tourne, et ses deux anomalies sont bien la.
+
+    Le plafond de 6 des et le plancher de 1 de aplatissent les extremes : un
+    Combat 6 met le meme temps a abattre n'importe qui, et un Combat 2 met le
+    meme temps quel que soit l'adversaire au-dessus de lui. C'est le defaut
+    que le tutoriel doit faire trouver.
     """
     with tempfile.TemporaryDirectory() as tmp:
         resume, _ = lancer(EXEMPLE, tmp, tirages=20000)
         texte = resume.read_text(encoding="utf-8")
-        verifier("l'exemple produit un resume", "## blessures" in texte)
+        verifier("l'exemple produit un resume", "## tours pour abattre" in texte)
 
-        degats = {}
-        touche = {}
-        section = None
-        for ligne in texte.splitlines():
-            if ligne.startswith("## "):
-                section = ligne[3:].strip()
-            if not ligne.startswith("| ") or "---" in ligne:
-                continue
-            cellules = [c.strip() for c in ligne.strip("|").split("|")]
-            if len(cellules) < 4 or cellules[0] in ("arme",):
-                continue
-            cle = (cellules[0], cellules[1], cellules[2])
-            if section == "blessures":
-                degats[cle] = float(cellules[3])
-            elif section == "issue":
-                touche[cle] = float(cellules[5].replace(" %", ""))
+        tours = lire_moyennes(texte, "tours pour abattre")
+        verifier("les 25 scenarios sont la", len(tours) == 25, f"obtenu {len(tours)}")
 
-        arc = ("Arc long", "3", "0")
-        baton = ("Baton", "3", "0")
-        verifier("l'Arc long touche nettement plus que le Baton",
-                 touche[arc] - touche[baton] > 5,
-                 f"{touche[arc]} contre {touche[baton]}")
-        verifier("l'Arc long n'inflige pas plus de degats",
-                 abs(degats[arc] - degats[baton]) < 0.05,
-                 f"{degats[arc]} contre {degats[baton]}")
+        haut = [tours[("6", str(c))] for c in range(2, 7)]
+        verifier("un Combat 6 abat tout le monde a la meme vitesse",
+                 max(haut) - min(haut) < 0.1,
+                 f"de {min(haut):.2f} a {max(haut):.2f}")
+
+        bas = [tours[("2", str(c))] for c in range(3, 7)]
+        verifier("un Combat 2 met le meme temps face a 3, 4, 5 et 6",
+                 max(bas) - min(bas) < 0.2,
+                 f"de {min(bas):.2f} a {max(bas):.2f}")
+
+        verifier("Combat 4 et Combat 6 sont identiques face a un Combat 2",
+                 abs(tours[("4", "2")] - tours[("6", "2")]) < 0.1,
+                 f"{tours[('4', '2')]:.2f} contre {tours[('6', '2')]:.2f}")
+
+        verifier("le plancher double le temps d'abattage entre 2v2 et 2v3",
+                 tours[("2", "3")] > 1.8 * tours[("2", "2")],
+                 f"{tours[('2', '2')]:.2f} puis {tours[('2', '3')]:.2f}")
 
 
 def main():

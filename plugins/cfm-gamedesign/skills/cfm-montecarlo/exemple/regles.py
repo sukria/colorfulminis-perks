@@ -1,4 +1,4 @@
-"""Les Gardiens du Pont — l'action d'Attaque.
+"""Arene — les regles du duel.
 
 Traduction en code de `regles.md`, et de rien d'autre.
 Toute divergence entre ce fichier et `regles.md` se corrige ici.
@@ -8,42 +8,36 @@ Lancer :
     python3 ../scripts/montecarlo.py regles.py --tirages 200000 --sortie ./resultats
 """
 
-NOM = "Les Gardiens du Pont — l'action d'Attaque"
+NOM = "Arene — le duel"
 
 NOTE = (
-    "Regles simulees : `regles.md`. Les blessures sont comptees **apres** "
-    "l'armure de la cible."
+    "L'attaquant frappe une fois par tour et la cible ne riposte pas : "
+    "`tours` mesure le temps d'abattage, pas l'issue d'un duel."
 )
 
 # --------------------------------------------------------------------------
 # Le bareme. Toute modification se fait ici, et nulle part ailleurs.
 # --------------------------------------------------------------------------
 
-SEUIL = 4          # un de de 4 ou plus est un succes
-DEG_PAR_5 = 1      # chaque 5 inflige 1 blessure
-DEG_PAR_6 = 2      # chaque 6 inflige 2 blessures
-DEF_SEUIL = 5      # chaque 5+ en defense annule 1 blessure
+DEG_PAR_5 = 1        # chaque 5 inflige 1 blessure
+DEG_PAR_6 = 2        # chaque 6 inflige 2 blessures
 
-# Une arme = une clause, decrite comme le texte de sa ligne de tableau.
-#   plat   blessures ajoutees a toute attaque reussie
-#   par_6  blessures ajoutees par 6 obtenu
-#   subst  {valeur lue: valeur retenue}
-ARMES = {
-    "Baton":    dict(plat=0, par_6=0, subst={}),
-    "Epee":     dict(plat=1, par_6=0, subst={}),
-    "Hache":    dict(plat=0, par_6=1, subst={}),
-    "Arc long": dict(plat=0, par_6=0, subst={3: 4}),
-}
+DES_MIN = 1          # jamais moins de 1 de
+DES_MAX = 6          # jamais plus de 6 des
+
+PV_STANDARD = 10     # points de vie d'une figurine
+TOURS_MAX = 200      # garde-fou : un duel qui ne finit pas est un bug
+
+COMBAT = (2, 3, 4, 5, 6)
 
 # --------------------------------------------------------------------------
-# Les cas a mesurer
+# Les cas a mesurer : chaque niveau de Combat contre chaque autre.
 # --------------------------------------------------------------------------
 
 SCENARIOS = [
-    {"arme": arme, "vigueur": vigueur, "armure": armure}
-    for arme in ARMES
-    for vigueur in (1, 2, 3, 4, 5, 6)
-    for armure in (0, 2)
+    {"attaquant": a, "cible": c}
+    for a in COMBAT
+    for c in COMBAT
 ]
 
 
@@ -51,31 +45,33 @@ SCENARIOS = [
 # Une resolution, une fois
 # --------------------------------------------------------------------------
 
-def resoudre(scenario, rng):
-    arme = ARMES[scenario["arme"]]
+def des_lances(combat_attaquant, combat_cible):
+    """1 de par point de Combat, plus ou moins 1 de par point d'ecart."""
+    n = combat_attaquant + (combat_attaquant - combat_cible)
+    return max(DES_MIN, min(DES_MAX, n))
 
-    des = [rng.randint(1, 6) for _ in range(scenario["vigueur"])]
-    des = [arme["subst"].get(d, d) for d in des]
 
-    succes = sum(1 for d in des if d >= SEUIL)
-
-    if succes == 0:
-        maladroit = any(d == 1 for d in des)
-        return {
-            "issue": "maladresse" if maladroit else "echec",
-            "touche": 0,
-            "blessures": 0,
-        }
-
+def une_attaque(n, rng):
+    des = [rng.randint(1, 6) for _ in range(n)]
     k5 = sum(1 for d in des if d == 5)
     k6 = sum(1 for d in des if d == 6)
-    brut = DEG_PAR_5 * k5 + DEG_PAR_6 * k6 + arme["plat"] + arme["par_6"] * k6
+    return DEG_PAR_5 * k5 + DEG_PAR_6 * k6
 
-    annule = sum(1 for _ in range(scenario["armure"])
-                 if rng.randint(1, 6) >= DEF_SEUIL)
+
+def resoudre(scenario, rng):
+    n = des_lances(scenario["attaquant"], scenario["cible"])
+
+    premiere = une_attaque(n, rng)
+
+    pv = PV_STANDARD - premiere
+    tours = 1
+    while pv > 0 and tours < TOURS_MAX:
+        pv -= une_attaque(n, rng)
+        tours += 1
 
     return {
-        "issue": "succes",
-        "touche": 1,
-        "blessures": max(0, brut - annule),
+        "des": n,
+        "degats par tour": premiere,
+        "issue": "aucun degat" if premiere == 0 else "touche",
+        "tours pour abattre": tours,
     }

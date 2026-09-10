@@ -41,23 +41,36 @@ Rien à installer d'autre : le moteur est du Python 3.9 sans aucune dépendance.
 
 ## Essayer en deux minutes
 
-Le dépôt contient un jeu jouet complet, [Les Gardiens du Pont](plugins/cfm-gamedesign/skills/cfm-montecarlo/exemple/regles.md) — quatre armes, une armure, une maladresse. **Il contient un défaut d'équilibrage, et la simulation le trouve en une minute.**
+Le dépôt contient un jeu jouet complet, [Arène](plugins/cfm-gamedesign/skills/cfm-montecarlo/exemple/regles.md), qui tient en une page :
+
+- Une figurine a un **Combat** de 2 à 6, c'est son nombre de dés, et **10 points de vie**.
+- Chaque **5** inflige 1 blessure, chaque **6** en inflige 2.
+- On lance 1 dé par point de Combat, **plus ou moins 1 dé par point d'écart** avec l'adversaire. Jamais moins de 1 dé, jamais plus de 6.
+
+Ces règles paraissent saines. La question est simple : **combien de tours pour abattre une figurine à 10 points de vie ?**
 
 ```bash
 cd plugins/cfm-gamedesign/skills/cfm-montecarlo/exemple
 python3 ../scripts/montecarlo.py regles.py --tirages 200000 --sortie ./resultats
 ```
 
-Ouvrez `resultats/resume.md` et comparez ces deux lignes, à Vigueur 3 sans armure :
+Ouvrez `resultats/resume.md`. Tours moyens pour abattre :
 
-| Arme | Réussite | Dégâts moyens |
-|---|---|---|
-| Bâton | 87,3 % | 1,49 |
-| Arc long | **96,0 %** | **1,50** |
+| Attaquant \ Cible | 2 | 3 | 4 | 5 | 6 |
+|---|---|---|---|---|---|
+| **Combat 2** | 10,6 | 20,7 | 20,7 | 20,6 | 20,6 |
+| **Combat 3** | 5,6 | 7,2 | 10,6 | 20,7 | 20,7 |
+| **Combat 4** | **3,9** | 4,5 | 5,6 | 7,2 | 10,6 |
+| **Combat 5** | **3,9** | **3,9** | **3,9** | 4,5 | 5,5 |
+| **Combat 6** | **3,9** | **3,9** | **3,9** | **3,9** | **3,9** |
 
-L'Arc long réussit 9 points de plus et ne fait pas plus de dégâts. Sa clause — « les 3 comptent comme des 4 » — crée des succès qui touchent sans blesser, puisque le barème ne paie que les 5 et les 6. **C'est une option décorative : le joueur choisit, et son choix n'existe pas.**
+Deux défauts, et ils sont graves :
 
-Aucune relecture ne trouve ça. 200 000 tirages, oui.
+- **Un Combat 6 abat tout le monde en 3,9 tours.** Un adversaire à 2 ou à 6, c'est identique. Le plafond de 6 dés mange toute sa supériorité — au sommet, l'écart de Combat ne veut plus rien dire.
+- **Un Combat 2 met 20,6 tours contre 3, 4, 5 comme 6.** Le plancher de 1 dé fait la même chose en bas.
+- Et **un Combat 4 contre un Combat 2 vaut exactement un Combat 6** : 3,9 tours des deux côtés. Deux points de caractéristique pour rien.
+
+Aucune relecture des règles ne trouve ça. 200 000 tirages, oui — et il devient évident que c'est l'écart qu'il faut borner, pas le nombre de dés.
 
 ## Comment c'est fait
 
@@ -68,7 +81,7 @@ Deux fichiers, et la séparation entre les deux est tout l'intérêt :
 
 ```python
 SCENARIOS = [...]                      # les cas à balayer
-def resoudre(scenario, rng) -> dict:   # un coup, une fois
+def resoudre(scenario, rng) -> dict:   # une résolution, une fois
 ```
 
 Le contrat complet tient dans [`references/moteur.md`](plugins/cfm-gamedesign/skills/cfm-montecarlo/references/moteur.md).
@@ -85,7 +98,7 @@ Oui. La compétence a été rejouée sur l'action de Tir de Call of Dungeons, co
 python3 plugins/cfm-gamedesign/skills/cfm-montecarlo/evals/test_moteur.py
 ```
 
-22 vérifications, sans pytest ni dépendance : convergence vers des valeurs connues à la main, reproductibilité à graine fixée, format du CSV, refus propre des règles invalides, et présence de l'anomalie dans l'exemple.
+24 vérifications, sans pytest ni dépendance : convergence vers des valeurs connues à la main, reproductibilité à graine fixée, format du CSV, refus propre des règles invalides, et présence des deux zones plates dans l'exemple.
 
 Les scénarios de comportement de la compétence sont dans [`evals/evals.json`](plugins/cfm-gamedesign/skills/cfm-montecarlo/evals/evals.json).
 

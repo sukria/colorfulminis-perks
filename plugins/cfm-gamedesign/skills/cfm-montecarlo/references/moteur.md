@@ -9,7 +9,7 @@ NOM = "…"          # titre du rapport                        (facultatif)
 NOTE = "…"         # ce que la simulation suppose            (facultatif)
 
 SCENARIOS = [      # obligatoire : un dict = une ligne de résultat
-    {"arme": "Épée", "vigueur": 3, "armure": 0},
+    {"attaquant": 4, "cible": 6},
     …
 ]
 
@@ -25,16 +25,18 @@ Elles se construisent presque toujours en compréhension :
 
 ```python
 SCENARIOS = [
-    {"arme": a, "vigueur": v, "armure": ar}
-    for a in ARMES for v in (1, 2, 3, 4, 5, 6) for ar in (0, 2)
+    {"attaquant": a, "cible": c}
+    for a in COMBAT for c in COMBAT
 ]
 ```
 
-⚠️ **Le produit explose vite.** 4 × 6 × 2 = 48, c'est confortable. 4 × 6 × 4 × 3 = 288, c'est déjà trop long à lire. Au-delà, réduis une dimension à ses bornes.
+⚠️ **Le produit explose vite.** 5 × 5 = 25, c'est confortable. 4 × 6 × 4 × 3 = 288, c'est déjà trop long à lire. Au-delà, réduis une dimension à ses bornes.
 
 ### `resoudre(scenario, rng)`
 
-Joue **un** coup, **une** fois, et retourne ce qui s'est passé.
+Joue **une** résolution, **une** fois, et retourne ce qui s'est passé.
+
+Elle peut boucler à l'intérieur d'un tirage quand la mesure l'exige — enchaîner les tours d'un duel jusqu'à l'abattage, par exemple. Ce qu'elle ne fait jamais, c'est agréger entre tirages.
 
 - `scenario` est un des dictionnaires de `SCENARIOS`.
 - `rng` est un `random.Random` déjà initialisé avec la graine. **Utilise-le, et jamais `random` directement** : c'est lui qui rend la simulation reproductible.
@@ -42,9 +44,9 @@ Joue **un** coup, **une** fois, et retourne ce qui s'est passé.
 
 ```python
 def resoudre(scenario, rng):
-    des = [rng.randint(1, 6) for _ in range(scenario["vigueur"])]
+    des = [rng.randint(1, 6) for _ in range(nombre_de_des(scenario))]
     ...
-    return {"issue": "succes", "blessures": 3}
+    return {"issue": "touche", "tours pour abattre": 4}
 ```
 
 ## Comment les sorties sont lues
@@ -58,9 +60,9 @@ Le moteur regarde le **type** de chaque valeur retournée :
 
 C'est le seul réglage, et il se fait en choisissant le type de retour.
 
-> 💡 **Le piège des booléens.** `True` est un entier en Python, mais le moteur le traite en catégorie — sinon `touche: True` serait moyenné au lieu d'être compté. Si tu veux un taux, retourne une chaîne ou un booléen. Si tu veux une moyenne, retourne un nombre.
+> 💡 **Le piège des booléens.** `True` est un entier en Python, mais le moteur le traite en catégorie — sinon `touche : True` serait moyenné au lieu d'être compté. Si tu veux un taux, retourne une chaîne ou un booléen. Si tu veux une moyenne, retourne un nombre.
 
-**Retourne les deux quand les deux ont un sens.** `{"issue": "succes", "blessures": 3}` donne un tableau de taux *et* un tableau de dégâts, pour le prix d'un.
+**Retourne les deux quand les deux ont un sens.** `{"issue": "touche", "tours pour abattre": 4}` donne un tableau de taux *et* un tableau de durées, pour le prix d'un.
 
 ## Les erreurs que le moteur refuse
 
