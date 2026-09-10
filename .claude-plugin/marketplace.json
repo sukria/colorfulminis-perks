@@ -1,0 +1,16 @@
+{
+  "name": "colorfulminis-perks",
+  "owner": {
+    "name": "Colorfulminis",
+    "url": "https://www.youtube.com/@Colorfulminis"
+  },
+  "plugins": [
+    {
+      "name": "cfm-gamedesign",
+      "version": "0.1.0",
+      "description": "Outils de game design assiste par IA. Contient /cfm-montecarlo : equilibrer une regle de jeu par simulation Monte-Carlo, depuis un fichier de regles en francais jusqu'aux tableaux qui repondent.",
+      "category": "productivity",
+      "source": "./plugins/cfm-gamedesign"
+    }
+  ]
+}

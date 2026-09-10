@@ -1,0 +1,11 @@
+{
+  "name": "cfm-gamedesign",
+  "version": "0.1.0",
+  "description": "Outils de game design assiste par IA. Contient /cfm-montecarlo : equilibrer une regle de jeu par simulation Monte-Carlo, depuis un fichier de regles en francais jusqu'aux tableaux qui repondent.",
+  "author": {
+    "name": "Colorfulminis",
+    "url": "https://www.youtube.com/@Colorfulminis"
+  },
+  "homepage": "https://github.com/sukria/colorfulminis-perks",
+  "license": "MIT"
+}

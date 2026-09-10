@@ -1,0 +1,66 @@
+{
+  "skill_name": "cfm-montecarlo",
+  "note": "Deux niveaux de validation. `test_moteur.py` verifie le moteur automatiquement : il se lance seul et n'a pas besoin d'un modele. Les scenarios ci-dessous verifient le comportement de la competence elle-meme, et se jouent a la main (ou par une session Claude sur demande) chaque fois que SKILL.md change. Le repertoire de travail de chaque scenario est `exemple/`, sauf mention contraire.",
+  "evals": [
+    {
+      "id": 1,
+      "name": "la lecture des regles est validee avant tout code",
+      "prompt": "/cfm-montecarlo exemple/regles.md",
+      "expected_output": "Restitue les regles en une liste courte, un mecanisme par ligne, et demande validation AVANT d'ecrire regles.py. Signale au minimum un point non tranche par le texte. N'ecrit aucun fichier et ne lance aucune simulation a ce stade."
+    },
+    {
+      "id": 2,
+      "name": "les questions sont posees avec des defauts, sans insister",
+      "prompt": "/cfm-montecarlo exemple/regles.md, puis « va-y, prends les valeurs par defaut »",
+      "expected_output": "A pose les quatre questions (mesures, dimensions, tirages, graine) en annoncant leurs defauts, puis enchaine immediatement sur les defauts sans les reposer. Ne redemande pas confirmation apres un « va-y »."
+    },
+    {
+      "id": 3,
+      "name": "le moteur n'est jamais reecrit",
+      "prompt": "/cfm-montecarlo exemple/regles.md",
+      "expected_output": "Le seul fichier produit est un regles.py. scripts/montecarlo.py n'est ni modifie, ni copie, ni reimplemente. Aucune boucle de tirages, aucun calcul de moyenne et aucune ecriture CSV n'apparait dans regles.py."
+    },
+    {
+      "id": 4,
+      "name": "le bareme est extrait en constantes nommees",
+      "prompt": "/cfm-montecarlo exemple/regles.md",
+      "expected_output": "regles.py declare le seuil, les degats par 5, les degats par 6 et le seuil de defense en constantes en tete de fichier. Aucun de ces nombres n'apparait en dur dans le corps de resoudre(). Chaque arme porte en commentaire le texte de sa clause."
+    },
+    {
+      "id": 5,
+      "name": "resoudre() joue un coup et n'agrege rien",
+      "prompt": "/cfm-montecarlo exemple/regles.md",
+      "expected_output": "resoudre(scenario, rng) retourne un dict d'une seule resolution. Elle ne contient ni boucle sur les tirages, ni moyenne, ni statistics, ni accumulateur. Elle utilise le rng recu en argument et n'appelle jamais random directement."
+    },
+    {
+      "id": 6,
+      "name": "l'anomalie de l'Arc long est trouvee et enoncee",
+      "prompt": "/cfm-montecarlo exemple/regles.md puis « qu'est-ce qui cloche ? »",
+      "expected_output": "Identifie que l'Arc long augmente fortement le taux de reussite (96,0 % contre 87,3 % a Vigueur 3, armure 0) sans changer les degats moyens (1,50 contre 1,49), parce que les 3 devenus 4 touchent mais que le bareme ne paie que les 5 et les 6. Enonce le verdict avant l'explication, et chiffre les deux colonnes."
+    },
+    {
+      "id": 7,
+      "name": "une correction a la fois, puis relance",
+      "prompt": "suite de l'eval 6 : « corrige »",
+      "expected_output": "Propose UNE modification du bareme, la justifie, l'applique dans regles.py et relance la simulation avec la meme graine. Ne modifie pas plusieurs clauses dans la meme passe et ne touche pas au texte de regles.md sans le demander."
+    },
+    {
+      "id": 8,
+      "name": "le fichier de regles fait foi",
+      "prompt": "/cfm-montecarlo sur un regles.md dont une clause est manifestement cassee (ex. « chaque 7 inflige 2 blessures »)",
+      "expected_output": "Signale la divergence et demande l'arbitrage. Ne corrige pas silencieusement la regle en la codant autrement, et ne produit pas de resultats en faisant comme si la clause etait ecrite correctement."
+    },
+    {
+      "id": 9,
+      "name": "l'explosion combinatoire est bornee",
+      "prompt": "/cfm-montecarlo sur des regles a cinq dimensions de six valeurs chacune",
+      "expected_output": "Constate que le produit depasse ~200 scenarios, le dit, et propose de reduire une ou plusieurs dimensions a leurs bornes plutot que de tout balayer. Ne lance pas 7 776 scenarios sans prevenir."
+    },
+    {
+      "id": 10,
+      "name": "utilisable sur un jeu reel",
+      "prompt": "/cfm-montecarlo rules-library/extensions/la-traque/tir-regles-finales.md, depuis le depot callofdungeons-website",
+      "expected_output": "Produit un regles.py qui encode le Tir : cout, seuil 5+, 1 blessure par 5 et 2 par 6, les cinq armes avec leurs clauses, les deux malus d'Agilite, le test en opposition quand la cible est A couvert. Les taux de reussite obtenus sont a moins d'un point de tir-stats.md, arme par arme."
+    }
+  ]
+}
