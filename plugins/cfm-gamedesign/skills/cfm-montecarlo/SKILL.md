@@ -15,7 +15,7 @@ Cette compétence fait ce trajet en entier, depuis un fichier de règles en fran
 ## Ce qui existe déjà, à ne pas réécrire
 
 - `scripts/montecarlo.py` — le moteur. Il ne connaît aucun jeu. Il répète une résolution, agrège, et écrit. **Il ne se modifie pas.**
-- `exemple/regles.md` et `exemple/regles.py` — un jeu jouet complet, à lire avant d'écrire quoi que ce soit.
+- `references/modele-regles.py` — un `regles.py` complet et commenté, à lire avant d'écrire le tien.
 - `references/moteur.md` — le contrat exact du fichier de règles.
 
 Le seul fichier à produire est un `regles.py`. Tout le reste est fourni.
@@ -49,7 +49,7 @@ Quatre questions, avec leurs valeurs par défaut. **Propose les défauts et n'in
 
 ### 3 · Écrire `regles.py`
 
-Copie `exemple/regles.py` et remplace son contenu. Le contrat complet est dans `references/moteur.md`. En résumé :
+Prends `references/modele-regles.py` comme modèle. Le contrat complet est dans `references/moteur.md`. En résumé :
 
 ```python
 NOM = "..."                # titre du rapport

@@ -23,7 +23,7 @@ Dans Claude Code :
 /plugin install cfm-gamedesign@colorfulminis-perks
 ```
 
-Rien d'autre à installer : tout est du Markdown, plus un script Python sans dépendance.
+C'est tout. **Tout se passe ensuite dans Claude** : aucune commande à taper dans un terminal, rien à installer, aucune dépendance.
 
 ---
 
@@ -53,17 +53,17 @@ La méthode complète reste lisible seule dans [`methode-fiches-mj.md`](methode-
 
 La simulation contourne le calcul. **Au lieu de calculer la probabilité, on joue 200 000 fois et on compte.**
 
-Vous écrivez vos règles en français. La compétence les lit, vous pose quatre questions, les traduit en simulateur, l'exécute, et vous rend deux fichiers : un résumé lisible et le détail de tous les tirages en CSV.
-
-Depuis le dossier de votre jeu :
+Vous écrivez vos règles en français, dans un fichier. La compétence les lit, vous pose quatre questions, les traduit en simulateur, l'exécute, et vous rend un résumé lisible plus le détail de tous les tirages en CSV.
 
 ```
 /cfm-montecarlo mes-regles.md
 ```
 
-## Essayer en deux minutes
+## Essayer sur le jeu de démonstration
 
-Le dépôt contient un jeu jouet complet, [Arène](plugins/cfm-gamedesign/skills/cfm-montecarlo/exemple/regles.md), qui tient en une page :
+Le dépôt fournit un jeu d'entraînement : [`exemples/dummy-arena.md`](exemples/dummy-arena.md). **Un seul fichier, et aucune réponse à côté** — vous refaites toute la démarche vous-même.
+
+Il tient en une page :
 
 - Une figurine a un **Combat** de 2 à 6, c'est son nombre de dés, et **10 points de vie**.
 - Chaque **5** inflige 1 blessure, chaque **6** en inflige 2.
@@ -71,12 +71,13 @@ Le dépôt contient un jeu jouet complet, [Arène](plugins/cfm-gamedesign/skills
 
 Ces règles paraissent saines. La question est simple : **combien de tours pour abattre une figurine à 10 points de vie ?**
 
-```bash
-cd plugins/cfm-gamedesign/skills/cfm-montecarlo/exemple
-python3 ../scripts/montecarlo.py regles.py --tirages 200000 --sortie ./resultats
+Copiez le fichier dans un dossier vide, ouvrez Claude Code dedans, et lancez :
+
+```
+/cfm-montecarlo dummy-arena.md
 ```
 
-Ouvrez `resultats/resume.md`. Tours moyens pour abattre :
+Répondez à l'entretien, demandez 200 000 tirages, puis ouvrez le tableau `tours pour abattre` :
 
 | Attaquant \ Cible | 2 | 3 | 4 | 5 | 6 |
 |---|---|---|---|---|---|
@@ -86,11 +87,11 @@ Ouvrez `resultats/resume.md`. Tours moyens pour abattre :
 | **Combat 5** | **3,9** | **3,9** | **3,9** | 4,5 | 5,5 |
 | **Combat 6** | **3,9** | **3,9** | **3,9** | **3,9** | **3,9** |
 
-Deux défauts, et ils sont graves :
+Trois constats, et ils sont graves :
 
 - **Un Combat 6 abat tout le monde en 3,9 tours.** Un adversaire à 2 ou à 6, c'est identique. Le plafond de 6 dés mange toute sa supériorité — au sommet, l'écart de Combat ne veut plus rien dire.
 - **Un Combat 2 met 20,6 tours contre 3, 4, 5 comme 6.** Le plancher de 1 dé fait la même chose en bas.
-- Et **un Combat 4 contre un Combat 2 vaut exactement un Combat 6** : 3,9 tours des deux côtés. Deux points de caractéristique pour rien.
+- **Un Combat 4 contre un Combat 2 vaut exactement un Combat 6** : 3,9 tours des deux côtés. Deux points de caractéristique pour rien.
 
 Aucune relecture des règles ne trouve ça. 200 000 tirages, oui — et il devient évident que c'est l'écart qu'il faut borner, pas le nombre de dés.
 
@@ -98,7 +99,7 @@ Aucune relecture des règles ne trouve ça. 200 000 tirages, oui — et il devie
 
 Deux fichiers, et la séparation entre les deux est tout l'intérêt :
 
-- **`scripts/montecarlo.py`** — le moteur. Il ne connaît aucun jeu. Il répète une résolution, agrège, écrit. Il ne se modifie jamais.
+- **Le moteur** ne connaît aucun jeu. Il répète une résolution, agrège, écrit. Il ne se modifie jamais.
 - **`regles.py`** — vos règles, et rien d'autre. C'est le seul fichier que l'IA écrit.
 
 ```python
@@ -106,23 +107,19 @@ SCENARIOS = [...]                      # les cas à balayer
 def resoudre(scenario, rng) -> dict:   # une résolution, une fois
 ```
 
-Le contrat complet tient dans [`references/moteur.md`](plugins/cfm-gamedesign/skills/cfm-montecarlo/references/moteur.md).
-
 > 🚨 **La règle de fer : le fichier de règles fait foi.** Le code ne décide rien, il traduit. Si le code et les règles divergent, c'est le code qui est faux. L'IA n'a pas voix au chapitre sur votre jeu — elle traduit votre texte en quelque chose d'exécutable, et c'est déjà énorme.
+
+Le contrat complet est dans [`references/moteur.md`](plugins/cfm-gamedesign/skills/cfm-montecarlo/references/moteur.md).
 
 ## Ça marche sur un vrai jeu ?
 
 Oui. La compétence a été rejouée sur l'action de Tir de Call of Dungeons, contre un simulateur écrit à la main pour cette règle précise. **Elle retrouve ses chiffres à moins de 0,2 point**, arme par arme, et elle retrouve la même anomalie : à Agilité 7, on touche 7 points de plus pour 0,01 blessure de moins.
 
-## Validation
+## Pour les curieux
 
-```bash
-python3 plugins/cfm-gamedesign/skills/cfm-montecarlo/evals/test_moteur.py
-```
+Le moteur est vérifié par 24 tests sans dépendance, dans [`evals/test_moteur.py`](plugins/cfm-gamedesign/skills/cfm-montecarlo/evals/test_moteur.py) : convergence vers des valeurs connues à la main — la moyenne d'un dé à six faces tombe sur 3,5 —, reproductibilité à graine fixée, format du CSV, refus propre des règles invalides.
 
-24 vérifications, sans pytest ni dépendance : convergence vers des valeurs connues à la main, reproductibilité à graine fixée, format du CSV, refus propre des règles invalides, et présence des deux zones plates dans l'exemple.
-
-Les scénarios de comportement des deux compétences sont dans leurs `evals/evals.json` respectifs — [cfm-montecarlo](plugins/cfm-gamedesign/skills/cfm-montecarlo/evals/evals.json) (10 scénarios) et [cfm-fichejdr](plugins/cfm-gamedesign/skills/cfm-fichejdr/evals/evals.json) (12 scénarios). `cfm-fichejdr` n'a pas de test automatique : sa sortie est un paquet de fiches, et sa qualité se juge à la lecture.
+Les scénarios de comportement des deux compétences sont dans leurs `evals/evals.json` — [cfm-montecarlo](plugins/cfm-gamedesign/skills/cfm-montecarlo/evals/evals.json) (10 scénarios) et [cfm-fichejdr](plugins/cfm-gamedesign/skills/cfm-fichejdr/evals/evals.json) (12 scénarios).
 
 ## Licence
 

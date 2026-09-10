@@ -1,41 +1,41 @@
 {
   "skill_name": "cfm-montecarlo",
-  "note": "Deux niveaux de validation. `test_moteur.py` verifie le moteur automatiquement : il se lance seul et n'a pas besoin d'un modele. Les scenarios ci-dessous verifient le comportement de la competence elle-meme, et se jouent a la main (ou par une session Claude sur demande) chaque fois que SKILL.md change. Le repertoire de travail de chaque scenario est `exemple/`, sauf mention contraire. L'exemple livre est un jeu d'arene minimal : cinq niveaux de Combat, 10 points de vie, et deux zones plates a decouvrir.",
+  "note": "Deux niveaux de validation. `test_moteur.py` verifie le moteur automatiquement : il se lance seul et n'a pas besoin d'un modele. Les scenarios ci-dessous verifient le comportement de la competence elle-meme, et se jouent a la main (ou par une session Claude sur demande) chaque fois que SKILL.md change. Sauf mention contraire, chaque scenario part de `exemples/dummy-arena.md` copie dans un dossier vide : un jeu d'arene minimal, cinq niveaux de Combat, 10 points de vie, et deux zones plates a decouvrir.",
   "evals": [
     {
       "id": 1,
       "name": "la lecture des regles est validee avant tout code",
-      "prompt": "/cfm-montecarlo exemple/regles.md",
+      "prompt": "/cfm-montecarlo dummy-arena.md",
       "expected_output": "Restitue les regles en une liste courte, un mecanisme par ligne, et demande validation AVANT d'ecrire regles.py. Signale au minimum un point non tranche par le texte. N'ecrit aucun fichier et ne lance aucune simulation a ce stade."
     },
     {
       "id": 2,
       "name": "les questions sont posees avec des defauts, sans insister",
-      "prompt": "/cfm-montecarlo exemple/regles.md, puis « va-y, prends les valeurs par defaut »",
+      "prompt": "/cfm-montecarlo dummy-arena.md, puis « va-y, prends les valeurs par defaut »",
       "expected_output": "A pose les quatre questions (mesures, dimensions, tirages, graine) en annoncant leurs defauts, puis enchaine immediatement sur les defauts sans les reposer. Ne redemande pas confirmation apres un « va-y »."
     },
     {
       "id": 3,
       "name": "le moteur n'est jamais reecrit",
-      "prompt": "/cfm-montecarlo exemple/regles.md",
+      "prompt": "/cfm-montecarlo dummy-arena.md",
       "expected_output": "Le seul fichier produit est un regles.py. scripts/montecarlo.py n'est ni modifie, ni copie, ni reimplemente. Aucune boucle de tirages, aucun calcul de moyenne et aucune ecriture CSV n'apparait dans regles.py."
     },
     {
       "id": 4,
       "name": "le bareme est extrait en constantes nommees",
-      "prompt": "/cfm-montecarlo exemple/regles.md",
+      "prompt": "/cfm-montecarlo dummy-arena.md",
       "expected_output": "regles.py declare les degats par 5, les degats par 6, le plancher de des, le plafond de des et les points de vie en constantes en tete de fichier. Aucun de ces nombres n'apparait en dur dans le corps de resoudre(). La formule du nombre de des porte en commentaire le texte de sa regle."
     },
     {
       "id": 5,
       "name": "resoudre() joue un coup et n'agrege rien",
-      "prompt": "/cfm-montecarlo exemple/regles.md",
+      "prompt": "/cfm-montecarlo dummy-arena.md",
       "expected_output": "resoudre(scenario, rng) retourne un dict pour UN tirage. Elle peut boucler a l'interieur d'un tirage quand la mesure l'exige — ici, enchainer les tours jusqu'a l'abattage — mais elle n'agrege jamais entre tirages : ni moyenne, ni statistics, ni accumulateur inter-appels. Elle utilise le rng recu en argument et n'appelle jamais random directement."
     },
     {
       "id": 6,
       "name": "les deux zones plates sont trouvees et enoncees",
-      "prompt": "/cfm-montecarlo exemple/regles.md puis « qu'est-ce qui cloche ? »",
+      "prompt": "/cfm-montecarlo dummy-arena.md puis « qu'est-ce qui cloche ? »",
       "expected_output": "Identifie que le plafond de 6 des et le plancher de 1 de aplatissent les extremes : un Combat 6 abat n'importe quel adversaire en 3,86 tours, de 2 a 6, et un Combat 2 met 20,6 tours contre 3, 4, 5 comme 6. Signale au passage qu'un Combat 4 et un Combat 6 sont identiques face a un Combat 2. Enonce le verdict avant l'explication, et chiffre les lignes concernees."
     },
     {

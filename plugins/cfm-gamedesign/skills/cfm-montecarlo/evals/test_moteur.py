@@ -20,7 +20,7 @@ from pathlib import Path
 
 RACINE = Path(__file__).resolve().parent.parent
 MOTEUR = RACINE / "scripts" / "montecarlo.py"
-EXEMPLE = RACINE / "exemple" / "regles.py"
+EXEMPLE = RACINE / "references" / "modele-regles.py"
 
 echecs = []
 
@@ -204,7 +204,7 @@ def lire_moyennes(texte, section_voulue):
 
 
 def test_exemple_fourni():
-    """L'exemple livre tourne, et ses deux anomalies sont bien la.
+    """Le modele livre tourne, et ses deux anomalies sont bien la.
 
     Le plafond de 6 des et le plancher de 1 de aplatissent les extremes : un
     Combat 6 met le meme temps a abattre n'importe qui, et un Combat 2 met le
@@ -214,7 +214,7 @@ def test_exemple_fourni():
     with tempfile.TemporaryDirectory() as tmp:
         resume, _ = lancer(EXEMPLE, tmp, tirages=20000)
         texte = resume.read_text(encoding="utf-8")
-        verifier("l'exemple produit un resume", "## tours pour abattre" in texte)
+        verifier("le modele produit un resume", "## tours pour abattre" in texte)
 
         tours = lire_moyennes(texte, "tours pour abattre")
         verifier("les 25 scenarios sont la", len(tours) == 25, f"obtenu {len(tours)}")
@@ -246,7 +246,7 @@ def main():
         ("csv", test_csv),
         ("borne csv", test_borne_csv),
         ("regles invalides", test_regles_invalides),
-        ("exemple fourni", test_exemple_fourni),
+        ("modele de regles", test_exemple_fourni),
     ]
     for nom, fn in tests:
         print(f"\n{nom}")
