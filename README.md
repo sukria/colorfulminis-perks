@@ -7,10 +7,43 @@ Les outils que j'utilise vraiment, publiés pour que vous puissiez les reprendre
 
 ## Ce qu'il y a dedans
 
+Un plugin Claude Code, `cfm-gamedesign`, et deux compétences dedans :
+
 | | |
 |---|---|
-| [`methode-fiches-mj.md`](methode-fiches-mj.md) | La méthode pour générer des fiches de MJ jouables avec une IA |
+| [`/cfm-fichejdr`](plugins/cfm-gamedesign/skills/cfm-fichejdr/SKILL.md) | Produire un paquet de fiches de MJ jouables en direct |
 | [`/cfm-montecarlo`](plugins/cfm-gamedesign/skills/cfm-montecarlo/SKILL.md) | Équilibrer une règle de jeu par simulation |
+
+## Installation
+
+Dans Claude Code :
+
+```
+/plugin marketplace add sukria/colorfulminis-perks
+/plugin install cfm-gamedesign@colorfulminis-perks
+```
+
+Rien d'autre à installer : tout est du Markdown, plus un script Python sans dépendance.
+
+---
+
+# `/cfm-fichejdr` — les fiches de MJ
+
+**Un scénario doit être maîtrisable sans huit heures de lecture préliminaire.**
+
+Cette compétence transforme un scénario — le vôtre, ou un du commerce — en un paquet de fiches A4 imprimables, une par scène, par lieu et par PNJ. Une fiche se lit à table, une main dessus, pendant que six personnes attendent.
+
+```
+/cfm-fichejdr
+```
+
+Elle vous fait passer un entretien, vous soumet un plan, puis produit les fiches **une par une**, chacune validée avant la suivante. Elle ne dépend d'aucun système : tout ce qui est propre à votre partie se remplit à l'entretien.
+
+Chaque fiche porte les mêmes six blocs, toujours à la même place — ce qu'on lit à voix haute, ce qui se passe en trois beats, les jets déjà résolus, les indices en cases à cocher, les répliques prêtes à dire, et la sortie.
+
+> 🚨 **Le dernier bloc est le plus important du paquet.** La peur numéro un d'un MJ, c'est le silence après « bon… vous faites quoi ? ». Aucune fiche ne sort sans sa phrase de relance écrite noir sur blanc.
+
+La méthode complète reste lisible seule dans [`methode-fiches-mj.md`](methode-fiches-mj.md), pour qui préfère la charger à la main.
 
 ---
 
@@ -22,22 +55,11 @@ La simulation contourne le calcul. **Au lieu de calculer la probabilité, on jou
 
 Vous écrivez vos règles en français. La compétence les lit, vous pose quatre questions, les traduit en simulateur, l'exécute, et vous rend deux fichiers : un résumé lisible et le détail de tous les tirages en CSV.
 
-## Installation
-
-Dans Claude Code :
-
-```
-/plugin marketplace add sukria/colorfulminis-perks
-/plugin install cfm-gamedesign@colorfulminis-perks
-```
-
-Puis, depuis le dossier de votre jeu :
+Depuis le dossier de votre jeu :
 
 ```
 /cfm-montecarlo mes-regles.md
 ```
-
-Rien à installer d'autre : le moteur est du Python 3.9 sans aucune dépendance.
 
 ## Essayer en deux minutes
 
@@ -100,7 +122,7 @@ python3 plugins/cfm-gamedesign/skills/cfm-montecarlo/evals/test_moteur.py
 
 24 vérifications, sans pytest ni dépendance : convergence vers des valeurs connues à la main, reproductibilité à graine fixée, format du CSV, refus propre des règles invalides, et présence des deux zones plates dans l'exemple.
 
-Les scénarios de comportement de la compétence sont dans [`evals/evals.json`](plugins/cfm-gamedesign/skills/cfm-montecarlo/evals/evals.json).
+Les scénarios de comportement des deux compétences sont dans leurs `evals/evals.json` respectifs — [cfm-montecarlo](plugins/cfm-gamedesign/skills/cfm-montecarlo/evals/evals.json) (10 scénarios) et [cfm-fichejdr](plugins/cfm-gamedesign/skills/cfm-fichejdr/evals/evals.json) (12 scénarios). `cfm-fichejdr` n'a pas de test automatique : sa sortie est un paquet de fiches, et sa qualité se juge à la lecture.
 
 ## Licence
 

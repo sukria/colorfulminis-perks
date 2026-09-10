@@ -1,5 +1,11 @@
 # Méthode « fiches MJ » — cahier des charges réutilisable
 
+> 💡 **Cette méthode existe aussi en compétence installable** — `/cfm-fichejdr`, dans le
+> plugin `cfm-gamedesign` de ce dépôt. Elle fait exactement la même chose sans qu'on ait
+> besoin de charger ce fichier à la main. Voir le [README](README.md).
+>
+> Ce fichier reste valable et se charge toujours de la même façon.
+
 Ce fichier est un **mode d'emploi pour Claude Code**. Ouvre-le dans une session Claude
 Code, puis écris :
 

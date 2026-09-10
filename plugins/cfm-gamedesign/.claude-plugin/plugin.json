@@ -1,7 +1,7 @@
 {
   "name": "cfm-gamedesign",
-  "version": "0.1.0",
-  "description": "Outils de game design assiste par IA. Contient /cfm-montecarlo : equilibrer une regle de jeu par simulation Monte-Carlo, depuis un fichier de regles en francais jusqu'aux tableaux qui repondent.",
+  "version": "0.2.0",
+  "description": "Outils de game design assiste par IA. Deux competences : /cfm-montecarlo equilibre une regle de jeu par simulation Monte-Carlo, /cfm-fichejdr produit un paquet de fiches de MJ jouables en direct pour une partie de jeu de role.",
   "author": {
     "name": "Colorfulminis",
     "url": "https://www.youtube.com/@Colorfulminis"

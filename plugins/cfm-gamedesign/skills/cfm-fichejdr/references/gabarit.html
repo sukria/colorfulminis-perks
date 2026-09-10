@@ -1,0 +1,93 @@
+<!doctype html>
+<!--
+  Gabarit d'une fiche de MJ — une page A4.
+  A coller tel quel, puis remplir. Ne pas retoucher le CSS : il est calibre pour
+  qu'une fiche pleine tienne sur une seule page a l'impression.
+-->
+<html lang="fr"><head><meta charset="utf-8">
+<title>CODE — Titre de la fiche</title>
+<style>
+@page { size: A4; margin: 9mm 10mm; }
+* { box-sizing: border-box; }
+body { margin:0; color:#111; background:#fff; font-size:7.9pt; line-height:1.28;
+  font-family:"Iowan Old Style","Palatino Linotype",Palatino,Georgia,serif; }
+.hdr { display:flex; justify-content:space-between; align-items:flex-end;
+  border-bottom:3px double #000; padding-bottom:1.4mm; margin-bottom:2mm; }
+h1 { font-size:15pt; letter-spacing:.05em; text-transform:uppercase; margin:0; }
+h1 small { display:block; font-size:6.6pt; letter-spacing:.13em; font-weight:normal;
+  text-transform:none; font-style:italic; margin-top:.9mm; }
+.num { font-size:22pt; font-weight:700; line-height:1; }
+h2 { font-size:6.8pt; letter-spacing:.14em; text-transform:uppercase; margin:0 0 1mm;
+  padding-bottom:.5mm; border-bottom:1.5px solid #000; }
+h2 .n { display:inline-block; background:#000; color:#fff; padding:0 1.1mm;
+  margin-right:1.2mm; font-size:6.6pt; }
+.cols { column-count:2; column-gap:5.5mm; }
+.box { border:1px solid #000; padding:1.6mm 2mm; margin-bottom:2.2mm; break-inside:avoid; }
+.box.hv { border-width:2px; }
+.box.dk { background:#f2f2ef; }
+.read { border:2px solid #000; background:#faf8f3; padding:2mm 2.4mm; margin-bottom:2.2mm;
+  break-inside:avoid; font-style:italic; font-size:8.4pt; line-height:1.4; }
+.read .lbl { font-style:normal; font-size:6.2pt; letter-spacing:.16em; text-transform:uppercase;
+  display:block; margin-bottom:1.2mm; }
+p { margin:0 0 1mm; }
+ul, ol { margin:0 0 1mm; padding-left:3.8mm; }
+li { margin:0 0 .7mm; }
+.ck { list-style:none; padding-left:0; }
+.ck li { display:flex; gap:1.3mm; align-items:baseline; }
+.ck b.sq { display:inline-block; width:2.5mm; height:2.5mm; border:1px solid #000;
+  flex:0 0 auto; margin-top:.4mm; }
+table { width:100%; border-collapse:collapse; font-size:7.1pt; margin:0 0 1mm; }
+th,td { border:1px solid #000; padding:.5mm .9mm; text-align:left; vertical-align:top; }
+th { background:#e8e8e6; font-size:6.2pt; letter-spacing:.06em; text-transform:uppercase; }
+.say { font-style:italic; border-left:2.2px solid #000; padding-left:1.8mm; margin:.8mm 0 1.2mm; }
+.say b { font-style:normal; }
+.hint { font-size:6.5pt; color:#444; }
+.beat { font-size:6.4pt; letter-spacing:.12em; text-transform:uppercase;
+  border-bottom:1px solid #999; padding-bottom:.4mm; margin:1.6mm 0 .8mm; }
+.beat:first-child { margin-top:0; }
+@media screen { body { padding:9mm; } }
+</style></head><body>
+
+<div class="hdr">
+  <h1>Titre de la fiche<small>Où · qui est présent · ce que la fiche accomplit</small></h1>
+  <div class="num">CODE</div>
+</div>
+
+<div class="read">
+  <span class="lbl">① À lire à voix haute</span>
+  « Cinq lignes maximum, au présent, adressées aux joueurs. »
+</div>
+
+<div class="cols">
+  <div class="box hv dk">
+    <h2><span class="n">②</span> Ce qui se passe</h2>
+    <div class="beat">1 · …</div><p>…</p>
+    <div class="beat">2 · …</div><p>…</p>
+    <div class="beat">3 · …</div><p>…</p>
+  </div>
+
+  <div class="box hv">
+    <h2><span class="n">③</span> Si les PJ font ça → jette ça</h2>
+    <table>
+      <tr><th>Le joueur</th><th>Le jet</th><th>Ce qu'il obtient</th></tr>
+      <tr><td>…</td><td>…</td><td>Réussi : … Raté : …</td></tr>
+    </table>
+  </div>
+
+  <div class="box dk">
+    <h2><span class="n">④</span> Indices à placer</h2>
+    <ul class="ck"><li><b class="sq"></b><span><b>INDICE n</b> — …</span></li></ul>
+  </div>
+
+  <div class="box">
+    <h2><span class="n">⑤</span> Répliques</h2>
+    <p class="say"><b>Nom :</b> « … » <span class="hint">(ton, sous-texte)</span></p>
+  </div>
+
+  <div class="box hv">
+    <h2><span class="n">⑥</span> Sortie · si ça bloque</h2>
+    <p><b>Vers :</b> …</p>
+    <p class="hint">🚨 <b>Si le silence tombe, dis :</b> « … »</p>
+  </div>
+</div>
+</body></html>

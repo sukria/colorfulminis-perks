@@ -1,0 +1,78 @@
+{
+  "skill_name": "cfm-fichejdr",
+  "note": "Scenarios de comportement, joues a la main (ou par une session Claude sur demande) chaque fois que SKILL.md change. Il n'y a pas de test automatique ici : la sortie est un paquet de fiches, et sa qualite se juge a la lecture. Les evals 1, 3, 4 et 8 sont les seules qui protegent contre un paquet injouable — les autres sont du confort.",
+  "evals": [
+    {
+      "id": 1,
+      "name": "l'entretien passe avant tout, par lots courts",
+      "prompt": "/cfm-fichejdr",
+      "expected_output": "Entre en plan mode et pose le lot A seul (systeme, duree, joueurs, experience du MJ, langue). N'enchaine pas les six lots d'un bloc, ne produit aucune fiche, et propose un defaut sur chaque question qui s'y prete."
+    },
+    {
+      "id": 2,
+      "name": "rien n'est invente sur la fiction",
+      "prompt": "au lot B, repondre « je ne sais pas encore » sur la verite cachee",
+      "expected_output": "Redemande, ou propose deux ou trois pistes a choisir. N'invente pas une verite cachee et ne poursuit pas l'entretien en laissant le champ vide."
+    },
+    {
+      "id": 3,
+      "name": "chaque cle de PJ recoit sa porte de sortie",
+      "prompt": "au lot C, declarer un PJ dont la cle est « seul lui peut ouvrir le coffre »",
+      "expected_output": "Demande explicitement ce qui se passe si ce joueur est absent ou echoue, et inscrit la porte de sortie dans le plan. Ne laisse pas passer une dependance sans issue."
+    },
+    {
+      "id": 4,
+      "name": "un indice a porte unique est signale",
+      "prompt": "au lot D, declarer un indice qui n'arrive que par un jet de Perception",
+      "expected_output": "Signale que l'indice est un point de rupture et propose soit une deuxieme porte, soit de le rendre automatique. Ne se contente pas de l'enregistrer."
+    },
+    {
+      "id": 5,
+      "name": "le plan sort avant la premiere fiche, et se fait valider",
+      "prompt": "entretien complet, puis « on y va »",
+      "expected_output": "Ecrit plan-fiches-mj.md avec la table, le groupe (cle + porte de sortie par PJ), les verrous de continuite avec leur pourquoi, et les taches en cases a cocher groupees en lots. Attend la validation avant d'ecrire la moindre fiche."
+    },
+    {
+      "id": 6,
+      "name": "production une par une, jamais en lot",
+      "prompt": "plan valide, puis « produis les fiches »",
+      "expected_output": "Annonce la premiere fiche, ecrit son .html et son .pdf, verifie qu'elle tient sur une page, puis ATTEND la validation. Ne produit pas le lot 1 entier d'un bloc, meme si l'utilisateur dit « toutes »."
+    },
+    {
+      "id": 7,
+      "name": "le gabarit est colle tel quel",
+      "prompt": "production d'une fiche de scene",
+      "expected_output": "Le .html reprend le CSS de references/gabarit.html sans le retoucher : @page A4, les six blocs aux memes classes, la colonne double. N'improvise pas une mise en page et ne change pas les tailles de police pour faire rentrer du texte."
+    },
+    {
+      "id": 8,
+      "name": "aucune fiche ne sort sans son bloc 6",
+      "prompt": "production d'une fiche de PNJ ou de lieu",
+      "expected_output": "Le bloc 6 est present, avec la sortie ET la phrase de relance ecrite entre guillemets. S'applique aussi aux fiches qui ne sont pas des scenes — c'est la ou l'oubli arrive."
+    },
+    {
+      "id": 9,
+      "name": "on coupe, on n'ajoute pas de page",
+      "prompt": "une fiche dont le contenu deborde de la page A4",
+      "expected_output": "Coupe dans le decor, puis dans les nuances du bloc 2, puis dans les entrees rares du bloc 3. Ne passe jamais a deux pages, ne reduit pas la police du gabarit, et ne touche pas aux blocs 1, 4 et 6."
+    },
+    {
+      "id": 10,
+      "name": "une fiche joueur ne spoile rien",
+      "prompt": "production d'une fiche J* pour un PJ dont la cle revele la verite cachee",
+      "expected_output": "La fiche ne contient que ce que le personnage sait avant le debut de la partie. La verite cachee, les fins possibles et le contenu des autres fiches n'y apparaissent sous aucune forme, meme allusive."
+    },
+    {
+      "id": 11,
+      "name": "le plan valide est verrouille",
+      "prompt": "en cours de production, « ajoute un PNJ qui trahit au lieu 3 »",
+      "expected_output": "Signale que le plan est verrouille, chiffre l'impact (quelles fiches deja produites sont a reprendre), et demande un arbitrage explicite. Ne glisse pas le changement dans la fiche en cours sans le dire."
+    },
+    {
+      "id": 12,
+      "name": "le paquet public est traite differemment",
+      "prompt": "au lot F, repondre « paquet public »",
+      "expected_output": "Passe les PJ en roles numerotes avec blancs a remplir, exige une porte de sortie ecrite pour chaque dependance, verifie l'absence de spoiler joueur, et ajoute la mention legale d'attribution de marque en pied de page de garde."
+    }
+  ]
+}
