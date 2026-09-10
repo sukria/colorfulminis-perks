@@ -1,18 +1,18 @@
 # Colorfulminis — perks
 
-Les outils que j'utilise vraiment, publiés pour que vous puissiez les reprendre.
-
 - 📹 [La chaîne YouTube](https://www.youtube.com/@Colorfulminis)
 - 🎲 [Call of Dungeons](https://callofdungeons.com)
 
 ## Ce qu'il y a dedans
 
-Un plugin Claude Code, `cfm-gamedesign`, et deux compétences dedans :
+Un plugin Claude Code, `cfm-gamedesign`, et deux skills  :
 
-| | |
-|---|---|
-| [`/cfm-fichejdr`](plugins/cfm-gamedesign/skills/cfm-fichejdr/SKILL.md) | Produire un paquet de fiches de MJ jouables en direct |
-| [`/cfm-montecarlo`](plugins/cfm-gamedesign/skills/cfm-montecarlo/SKILL.md) | Équilibrer une règle de jeu par simulation |
+
+|                                                                            |                                                                                                                                                    |
+| -------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [`/cfm-fichejdr`](plugins/cfm-gamedesign/skills/cfm-fichejdr/SKILL.md)     | Produire un paquet de fiches de MJ jouables en direct → [https://www.youtube.com/watch?v=sO6PI1Ax474](https://www.youtube.com/watch?v=sO6PI1Ax474) |
+| [`/cfm-montecarlo`](plugins/cfm-gamedesign/skills/cfm-montecarlo/SKILL.md) | Équilibrer une règle de jeu par simulation Monte Carlo                                                                                             |
+
 
 ## Installation
 
@@ -23,7 +23,7 @@ Dans Claude Code :
 /plugin install cfm-gamedesign@colorfulminis-perks
 ```
 
-C'est tout. **Tout se passe ensuite dans Claude** : aucune commande à taper dans un terminal, rien à installer, aucune dépendance.
+**Tout se passe ensuite dans Claude** **Code**.
 
 ---
 
@@ -31,29 +31,25 @@ C'est tout. **Tout se passe ensuite dans Claude** : aucune commande à taper dan
 
 **Un scénario doit être maîtrisable sans huit heures de lecture préliminaire.**
 
-Cette compétence transforme un scénario — le vôtre, ou un du commerce — en un paquet de fiches A4 imprimables, une par scène, par lieu et par PNJ. Une fiche se lit à table, une main dessus, pendant que six personnes attendent.
+Cette skill transforme un scénario (le vôtre, ou un du commerce que vous résumez), en un paquet de fiches A4 imprimables, une par scène, par lieu et par PNJ. 
 
 ```
 /cfm-fichejdr
 ```
 
-Elle vous fait passer un entretien, vous soumet un plan, puis produit les fiches **une par une**, chacune validée avant la suivante. Elle ne dépend d'aucun système : tout ce qui est propre à votre partie se remplit à l'entretien.
+La skill vous pose des questions pour préciser le cadre et affiner la structure du scénario, ensuite elle vous soumet un plan, puis produit les fiches **une par une, au format PDF**, chacune validée avant la suivante. 
 
-Chaque fiche porte les mêmes six blocs, toujours à la même place — ce qu'on lit à voix haute, ce qui se passe en trois beats, les jets déjà résolus, les indices en cases à cocher, les répliques prêtes à dire, et la sortie.
-
-> 🚨 **Le dernier bloc est le plus important du paquet.** La peur numéro un d'un MJ, c'est le silence après « bon… vous faites quoi ? ». Aucune fiche ne sort sans sa phrase de relance écrite noir sur blanc.
-
-La méthode complète reste lisible seule dans [`methode-fiches-mj.md`](methode-fiches-mj.md), pour qui préfère la charger à la main.
+Chaque fiche contient les mêmes  blocs, toujours à la même place : ce qu'on lit à voix haute, ce qui se passe, les tests possibles, les indices à trouver et la condition de sortie.
 
 ---
 
 # `/cfm-montecarlo` — équilibrer une règle par simulation
 
-**Un jeu qui repose sur des dés est un objet mesurable.** La plupart des barèmes se règlent au ressenti, parce que la probabilité exacte devient indécidable dès qu'on empile trois clauses : un malus, une opposition, une armure.
+**Un jeu qui repose sur des dés est un objet mesurable.** La plupart des barèmes se règlent au ressenti, parce que la probabilité exacte devient indécidable dès qu'on empile de multiples conditions (un malus, une opposition, une armure, des stats d'armes variables, etc).
 
-La simulation contourne le calcul. **Au lieu de calculer la probabilité, on joue 200 000 fois et on compte.**
+Une simulation de Monte Carlo est une méthode "brute force" qui contourne le calcul de complexité exponentielle à mesure que les variables entre en jeu. **Au lieu de calculer la probabilité, on joue 200 000 fois et on observe les résultats. La théorie des Grands Nombres fait le reste (les résultats convergent vers la probabilité).**
 
-Vous écrivez vos règles en français, dans un fichier. La compétence les lit, vous pose quatre questions, les traduit en simulateur, l'exécute, et vous rend un résumé lisible plus le détail de tous les tirages en CSV.
+Vous écrivez vos règles en français, dans un fichier. La skill les lit, vous pose quatre questions, les traduit en simulateur, l'exécute, et vous rend un résumé lisible plus le détail de tous les tirages en CSV.
 
 ```
 /cfm-montecarlo mes-regles.md
@@ -77,50 +73,8 @@ Copiez le fichier dans un dossier vide, ouvrez Claude Code dedans, et lancez :
 /cfm-montecarlo dummy-arena.md
 ```
 
-Répondez à l'entretien, demandez 200 000 tirages, puis ouvrez le tableau `tours pour abattre` :
-
-| Attaquant \ Cible | 2 | 3 | 4 | 5 | 6 |
-|---|---|---|---|---|---|
-| **Combat 2** | 10,6 | 20,7 | 20,7 | 20,6 | 20,6 |
-| **Combat 3** | 5,6 | 7,2 | 10,6 | 20,7 | 20,7 |
-| **Combat 4** | **3,9** | 4,5 | 5,6 | 7,2 | 10,6 |
-| **Combat 5** | **3,9** | **3,9** | **3,9** | 4,5 | 5,5 |
-| **Combat 6** | **3,9** | **3,9** | **3,9** | **3,9** | **3,9** |
-
-Trois constats, et ils sont graves :
-
-- **Un Combat 6 abat tout le monde en 3,9 tours.** Un adversaire à 2 ou à 6, c'est identique. Le plafond de 6 dés mange toute sa supériorité — au sommet, l'écart de Combat ne veut plus rien dire.
-- **Un Combat 2 met 20,6 tours contre 3, 4, 5 comme 6.** Le plancher de 1 dé fait la même chose en bas.
-- **Un Combat 4 contre un Combat 2 vaut exactement un Combat 6** : 3,9 tours des deux côtés. Deux points de caractéristique pour rien.
-
-Aucune relecture des règles ne trouve ça. 200 000 tirages, oui — et il devient évident que c'est l'écart qu'il faut borner, pas le nombre de dés.
-
-## Comment c'est fait
-
-Deux fichiers, et la séparation entre les deux est tout l'intérêt :
-
-- **Le moteur** ne connaît aucun jeu. Il répète une résolution, agrège, écrit. Il ne se modifie jamais.
-- **`regles.py`** — vos règles, et rien d'autre. C'est le seul fichier que l'IA écrit.
-
-```python
-SCENARIOS = [...]                      # les cas à balayer
-def resoudre(scenario, rng) -> dict:   # une résolution, une fois
-```
-
-> 🚨 **La règle de fer : le fichier de règles fait foi.** Le code ne décide rien, il traduit. Si le code et les règles divergent, c'est le code qui est faux. L'IA n'a pas voix au chapitre sur votre jeu — elle traduit votre texte en quelque chose d'exécutable, et c'est déjà énorme.
-
-Le contrat complet est dans [`references/moteur.md`](plugins/cfm-gamedesign/skills/cfm-montecarlo/references/moteur.md).
-
-## Ça marche sur un vrai jeu ?
-
-Oui. La compétence a été rejouée sur l'action de Tir de Call of Dungeons, contre un simulateur écrit à la main pour cette règle précise. **Elle retrouve ses chiffres à moins de 0,2 point**, arme par arme, et elle retrouve la même anomalie : à Agilité 7, on touche 7 points de plus pour 0,01 blessure de moins.
-
-## Pour les curieux
-
-Le moteur est vérifié par 24 tests sans dépendance, dans [`evals/test_moteur.py`](plugins/cfm-gamedesign/skills/cfm-montecarlo/evals/test_moteur.py) : convergence vers des valeurs connues à la main — la moyenne d'un dé à six faces tombe sur 3,5 —, reproductibilité à graine fixée, format du CSV, refus propre des règles invalides.
-
-Les scénarios de comportement des deux compétences sont dans leurs `evals/evals.json` — [cfm-montecarlo](plugins/cfm-gamedesign/skills/cfm-montecarlo/evals/evals.json) (10 scénarios) et [cfm-fichejdr](plugins/cfm-gamedesign/skills/cfm-fichejdr/evals/evals.json) (12 scénarios).
+Répondez aux questions, et voyez si vous trouver le défaut majeur de ces règles (spoiler: ce jeu n'a aucun intérêt en l'état !).
 
 ## Licence
 
-MIT. Prenez, modifiez, publiez vos jeux.
+MIT. C'est libre les amis.
